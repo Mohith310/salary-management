@@ -14,8 +14,10 @@
 - A unit test caught a UI bug: compact money labels rendered `$85.0K`. Fixed in `money.ts` with `minimumFractionDigits: 0`.
 - The production build tried to inline Google Fonts at build time, which fails on restricted networks. Disabled in `angular.json`; fonts load in the browser instead.
 
-## Known limits of this AI session
-- The sandbox could not reach Maven Central, so the backend test suite was **not executed there**. Run `cd backend && mvn test` locally before submitting.
+## Verification
+- Backend: `mvn test` passes locally (76 tests, 0 failures) on Java 21.
+- Frontend: `npm test` passes (13 tests).
+- Manually checked the full flow in the browser against the seeded 10,000 employees.
 
 ## Prompts
 _Add the key prompts you used here (requirements, design, test-first slices). Reviewers will ask about them._
