@@ -1,0 +1,160 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Employees</h1>
+      <p class="subtitle">
+        @if (loading() && rows().length === 0) {
+          Loading…
+        } @else {
+          {{ total() | number }} {{ total() === 1 ? 'employee' : 'employees' }}{{ hasActiveFilters() ? ' match your filters' : '' }}
+        }
+      </p>
+    </div>
+    <a mat-flat-button routerLink="/employees/new"><mat-icon>add</mat-icon> Add employee</a>
+  </header>
+
+  <form class="filters card" [formGroup]="filters" (submit)="$event.preventDefault()">
+    <mat-form-field appearance="outline" class="search">
+      <mat-label>Search name or email</mat-label>
+      <mat-icon matPrefix>search</mat-icon>
+      <input matInput formControlName="q" autocomplete="off" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Country</mat-label>
+      <mat-select formControlName="country">
+        <mat-option value="">All countries</mat-option>
+        @for (country of options().countries; track country) {
+          <mat-option [value]="country">{{ country }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Department</mat-label>
+      <mat-select formControlName="department">
+        <mat-option value="">All departments</mat-option>
+        @for (department of options().departments; track department) {
+          <mat-option [value]="department">{{ department }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Job title</mat-label>
+      <mat-select formControlName="jobTitle">
+        <mat-option value="">All job titles</mat-option>
+        @for (jobTitle of options().jobTitles; track jobTitle) {
+          <mat-option [value]="jobTitle">{{ jobTitle }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="salary">
+      <mat-label>Min salary</mat-label>
+      <input matInput type="number" min="0" formControlName="minSalary" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="salary">
+      <mat-label>Max salary</mat-label>
+      <input matInput type="number" min="0" formControlName="maxSalary" />
+    </mat-form-field>
+
+    <button mat-button type="button" (click)="clearFilters()" [disabled]="!hasActiveFilters()">Clear</button>
+
+    @if (!filters.controls.country.value) {
+      <p class="hint">Choose a country to filter by salary. Amounts are in each country's local currency.</p>
+    }
+  </form>
+
+  @if (error()) {
+    <div class="banner error" role="alert">{{ error() }}</div>
+  }
+
+  <div class="table-card card">
+    @if (loading()) {
+      <mat-progress-bar mode="indeterminate" />
+    }
+
+    <div class="table-scroll">
+      <table
+        mat-table
+        matSort
+        [dataSource]="rows()"
+        [matSortActive]="sortBy()"
+        [matSortDirection]="direction()"
+        matSortDisableClear
+        (matSortChange)="onSort($event)"
+      >
+        <ng-container matColumnDef="fullName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="fullName">Name</th>
+          <td mat-cell *matCellDef="let e">
+            <div class="name">{{ e.fullName }}</div>
+            <div class="email">{{ e.email }}</div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="jobTitle">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="jobTitle">Job title</th>
+          <td mat-cell *matCellDef="let e">{{ e.jobTitle }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="department">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="department">Department</th>
+          <td mat-cell *matCellDef="let e">{{ e.department }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="country">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="country">Country</th>
+          <td mat-cell *matCellDef="let e">{{ e.country }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="salary">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="salary" arrowPosition="before" class="num">
+            Annual salary
+          </th>
+          <td mat-cell *matCellDef="let e" class="num">{{ formatMoney(e.salary, e.currency) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="hireDate">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="hireDate">Hired</th>
+          <td mat-cell *matCellDef="let e">{{ e.hireDate | date: 'mediumDate' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="actions-col"></th>
+          <td mat-cell *matCellDef="let e" class="actions-col">
+            <a mat-icon-button [routerLink]="['/employees', e.id, 'edit']" [attr.aria-label]="'Edit ' + e.fullName">
+              <mat-icon>edit</mat-icon>
+            </a>
+            <button mat-icon-button type="button" (click)="remove(e)" [attr.aria-label]="'Delete ' + e.fullName">
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: columns"></tr>
+      </table>
+
+      @if (!loading() && !error() && rows().length === 0) {
+        <div class="empty">
+          <mat-icon>search_off</mat-icon>
+          <p>No employees match these filters.</p>
+          @if (hasActiveFilters()) {
+            <button mat-button type="button" (click)="clearFilters()">Clear filters</button>
+          }
+        </div>
+      }
+    </div>
+
+    <mat-paginator
+      [length]="total()"
+      [pageIndex]="page()"
+      [pageSize]="size()"
+      [pageSizeOptions]="[10, 25, 50, 100]"
+      showFirstLastButtons
+      (page)="onPage($event)"
+    />
+  </div>
+</section>

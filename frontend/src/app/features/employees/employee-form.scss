@@ -1,0 +1,29 @@
+.narrow {
+  max-width: 760px;
+}
+
+.form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 16px;
+  padding: 24px 24px 12px;
+
+  .full,
+  mat-progress-bar,
+  .actions {
+    grid-column: 1 / -1;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-bottom: 12px;
+  }
+}
+
+@media (max-width: 720px) {
+  .form {
+    grid-template-columns: 1fr;
+  }
+}
