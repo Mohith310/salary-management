@@ -1,0 +1,78 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <h1>Pay insights</h1>
+      <p class="subtitle">{{ scopeNote() }}</p>
+    </div>
+    <mat-form-field appearance="outline" class="scope">
+      <mat-label>Scope</mat-label>
+      <mat-select [value]="country()" (selectionChange)="selectCountry($event.value)" aria-label="Country scope">
+        <mat-option value="">All countries (USD)</mat-option>
+        @for (c of countries(); track c.country) {
+          <mat-option [value]="c.country">{{ c.country }} ({{ c.currency }})</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </header>
+
+  @if (error()) {
+    <div class="banner error" role="alert">{{ error() }}</div>
+  }
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate" />
+  }
+
+  @if (data(); as d) {
+    <div class="kpis" [class.stale]="loading()">
+      <div class="kpi card">
+        <span class="label">Headcount</span>
+        <span class="value">{{ d.summary.stats.headcount | number }}</span>
+      </div>
+      <div class="kpi card">
+        <span class="label">Total annual payroll</span>
+        <span class="value">{{ formatMoney(d.summary.stats.total, d.summary.currency, { compact: true }) }}</span>
+      </div>
+      <div class="kpi card">
+        <span class="label">Average salary</span>
+        <span class="value">{{ formatMoney(d.summary.stats.average, d.summary.currency) }}</span>
+      </div>
+      <div class="kpi card">
+        <span class="label">Median salary</span>
+        <span class="value">{{ formatMoney(d.summary.stats.median, d.summary.currency) }}</span>
+      </div>
+    </div>
+
+    <div class="card distribution" [class.stale]="loading()">
+      <h2>How salaries are spread</h2>
+      <p class="caption">Employees per annual salary band, in USD equivalent.</p>
+      @for (band of d.distribution.bands; track band.label) {
+        <div class="band">
+          <span class="band-label">{{ band.label }}</span>
+          <div class="track"><div class="fill" [style.width.%]="bandWidth(band.headcount)"></div></div>
+          <span class="band-count">{{ band.headcount | number }}</span>
+          <span class="band-share">{{ share(band.headcount, d.summary.stats.headcount) }}</span>
+        </div>
+      }
+    </div>
+
+    <div class="card tabs" [class.stale]="loading()">
+      <mat-tab-group animationDuration="0ms" mat-stretch-tabs="false">
+        <mat-tab label="By department">
+          <app-insights-table [rows]="d.byDepartment" groupLabel="Department" />
+        </mat-tab>
+        <mat-tab label="By job title">
+          <app-insights-table [rows]="d.byJobTitle" groupLabel="Job title" />
+        </mat-tab>
+        <mat-tab label="By country">
+          <p class="caption pad">Each country is shown in its own currency, so compare within a row, not across rows.</p>
+          <app-insights-table
+            [rows]="d.byCountry"
+            groupLabel="Country"
+            [showBars]="false"
+            [initialSort]="{ active: 'group', direction: 'asc' }"
+          />
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+  }
+</section>

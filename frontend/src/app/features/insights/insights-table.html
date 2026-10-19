@@ -1,0 +1,53 @@
+<div class="scroll">
+  <table
+    mat-table
+    matSort
+    matSortDisableClear
+    [dataSource]="sorted()"
+    [matSortActive]="active()"
+    [matSortDirection]="direction()"
+    (matSortChange)="onSort($event)"
+  >
+    <ng-container matColumnDef="group">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header="group">{{ groupLabel() }}</th>
+      <td mat-cell *matCellDef="let r">{{ r.group }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="headcount">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header="headcount" arrowPosition="before" class="num">Headcount</th>
+      <td mat-cell *matCellDef="let r" class="num">{{ r.stats.headcount | number }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="min">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header="min" arrowPosition="before" class="num">Min</th>
+      <td mat-cell *matCellDef="let r" class="num">{{ formatMoney(r.stats.min, r.currency) }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="median">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header="median" arrowPosition="before" class="num">Median</th>
+      <td mat-cell *matCellDef="let r" class="num">{{ formatMoney(r.stats.median, r.currency) }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="average">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header="average" arrowPosition="before" class="num">Average</th>
+      <td mat-cell *matCellDef="let r" class="num">
+        <div>{{ formatMoney(r.stats.average, r.currency) }}</div>
+        @if (showBars()) {
+          <div class="bar"><span [style.width.%]="barWidth(r.stats.average)"></span></div>
+        }
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="max">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header="max" arrowPosition="before" class="num">Max</th>
+      <td mat-cell *matCellDef="let r" class="num">{{ formatMoney(r.stats.max, r.currency) }}</td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="columns"></tr>
+    <tr mat-row *matRowDef="let row; columns: columns"></tr>
+  </table>
+
+  @if (rows().length === 0) {
+    <p class="empty">No data for this selection.</p>
+  }
+</div>
