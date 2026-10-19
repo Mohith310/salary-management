@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: salary-management
+  datasource:
+    # File-mode H2 so data survives restarts. Override DB_PATH to relocate it.
+    url: jdbc:h2:file:${DB_PATH:./data/salary}
+    username: sa
+    password:
+  jpa:
+    open-in-view: false
+    hibernate:
+      # Flyway owns the schema; Hibernate never changes it.
+      ddl-auto: none
+  flyway:
+    enabled: true
+
+server:
+  port: ${PORT:8080}
+
+app:
+  seed:
+    # Seeds only when the employees table is empty.
+    enabled: true
+    count: 10000
+    random-seed: 42
