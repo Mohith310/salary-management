@@ -2,6 +2,7 @@ package com.acme.salary.employee;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -87,7 +88,7 @@ class EmployeeControllerTest {
 
     @Test
     void updateReturnsTheUpdatedEmployee() throws Exception {
-        when(service.update(any(Long.class), any(EmployeeRequest.class))).thenReturn(sample());
+        when(service.update(anyLong(), any(EmployeeRequest.class))).thenReturn(sample());
 
         mvc.perform(put("/api/employees/1").contentType(MediaType.APPLICATION_JSON).content(VALID_BODY))
                 .andExpect(status().isOk())
