@@ -20,4 +20,40 @@
 - Manually checked the full flow in the browser against the seeded 10,000 employees.
 
 ## Prompts
-_Add the key prompts you used here (requirements, design, test-first slices). Reviewers will ask about them._
+## Prompts used
+
+Tool: Claude (Claude Code). I gave it the assessment brief and worked through it step by step.
+
+### 1. Understanding the task
+- Pasted the recruiter email and asked: "the link is opening a file instead of assessment, where should i do the assessment, how to share the project"
+- Pasted the full assessment document ("Assessment with Product Framing") and said: "this what present in the file"
+- Asked for the build: "help me doing this project"
+
+### 2. Delivering the work as incremental commits
+- "give me the zip file and give file by file for each commit"
+- "give me the initial zip file before first commit, I will upload that to git repo as first commit, then give the updated file for next commit one by one so that I can proceed with all the commits"
+- Pasted my git errors (no repository, no remote) and got the fix.
+- "i am done with the commits to the repo, what should i do next"
+
+### 3. Verifying locally and fixing environment problems
+- Pasted `mvn` not recognized, then my `java -version` (Java 8), and was told to install JDK 21 and Maven manually.
+- Pasted `winget install Apache.Maven` failing, then `java -version` showing 21.
+- Pasted Vite proxy errors (ECONNREFUSED) and then the backend startup log. This showed the backend simply wasn't running yet.
+- Pasted the `mvn test` result (76 tests, 0 failures) and the `npm test` result (13 tests passing).
+
+### 4. Deployment
+- Pasted the Render Docker build log (the `npm ci` failure). The AI traced it to an out-of-sync `package-lock.json`, regenerated it and verified a clean install and build.
+- Shared a screenshot of the failed and in-progress deploys, then confirmed "it is live".
+
+### 5. Demo video
+- "does video require voice over??", then "i don't want to speak" (got a silent, captioned plan)
+- "i will upload video files, will you edit them for me"
+- Uploaded two screen recordings and asked: "merge both the videos after editing"
+- Asked whether the video could be shared via Google Drive.
+
+## What I verified and corrected myself
+- Ran the backend (76 tests) and frontend (13 tests) suites locally. All pass.
+- Clicked through the app locally and on the live URL.
+- Found while recording the demo that the employee count showed 5,000 on first load after a cold start, then 10,000. This is a seeding race on the free tier.
+- Caught during development: a unit test found a UI bug (compact money labels showed "$85.0K"), fixed by adjusting the formatter.
+- Caught during deployment: Google Fonts inlining hung the production build, and the lock file broke `npm ci` in Docker. Both were fixed.
