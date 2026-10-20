@@ -47,5 +47,5 @@ Any host that runs a Dockerfile works (Render, Railway, Fly.io). Set `PORT` if t
 
 ## Deployed app and demo
 
-- Live URL: _add after deploying_
-- Demo video: _add link_
+- Live URL: https://salary-management-0wcy.onrender.com/
+- Demo video: https://drive.google.com/file/d/1trMII_FEGOtX-Hby84UYpTXVWD8oqz_p/view?usp=sharing
